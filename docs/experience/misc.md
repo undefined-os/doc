@@ -1,8 +1,8 @@
 # misc
 
-- 协助编写`Starry-Tutorial-Book`(https://azure-stars.github.io/Starry-Tutorial-Book)，已经提交`PR`并合并到上游仓库。
+- 协助编写[Starry-Tutorial-Book](https://azure-stars.github.io/Starry-Tutorial-Book)，已经提交`PR`并合并到上游仓库。
 
-- 协助编写`OS大赛赛题协作文档`(https://github.com/oscomp/oskernel-testsuits-cooperation)，已经提交`PR`并合并到上游仓库。
+- 协助编写[OS大赛赛题协作文档](https://github.com/oscomp/oskernel-testsuits-cooperation)，已经提交`PR`并合并到上游仓库。
 
 - 无效测例：在调试测例`fpclassify_invalid_ld80`的过程中，发现本地`wsl`运行此测例行为和输出结果与在实验框架下相同，但流水线测评为`fail`。经过沟通和确认发现`fpclassify_invalid_ld80`的测例代码在`x86_64`下编译工具链会出现问题，后联系了编写测评流水线的同学进行修改，`ban`掉了这个测例。
 
