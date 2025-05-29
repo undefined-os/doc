@@ -23,3 +23,12 @@
 
 - ArceOS：[eternalcomet/arceos: An experimental modular OS written in Rust.](https://github.com/eternalcomet/arceos)
 - UndefinedOS：[eternalcomet/undefined-os-final](https://github.com/eternalcomet/undefined-os-final)
+
+## 主要功能
+
+- 目前支持112个Linux系统调用
+- 进程管理：支持多线程和多进程并发控制，支持进程组/会话管理
+- 进程间通信：支持进程/线程间信号机制，支持共享内存
+- 文件系统：支持ext4, fat32, ramfs文件系统，且提供了可扩展的接口设计以支持新的文件系统
+- 内存管理：支持内存懒分配
+- bash环境：支持运行在Linux根文件系统上，提供了基础的bash交互功能
