@@ -18,7 +18,7 @@ NPUcore-IMPACT 基于原先的 NPUcore(RISCV) 开发迭代并扩展，实现POSI
 
 参考 NPUcore-IMPACT 的仓库与文档，他们总共实现了106个 POSIX 标准系统调用，数量上来看和我们相仿。与 Undefined-OS 相比，主要特点是
 
-- 进程/线程管理较简单（没有优先级调度，使用FIFO策略）
+- 进程/线程管理较简单
 - 实现了写时复制（CoW）
 - 实现了懒分配
 - 实现了I/O 缓冲
@@ -79,4 +79,6 @@ pub fn oom_handler(req: usize) -> Result<(), ()> {
 总体而言，NPUcore 在内存管理方面实现了一些我们没有的功能，文件系统没有明显区别，线程/进程部分实现的比较简单。
 
 其文档中自述，由于是第一年开启LoongArch赛道，花了大量时间精力来适配 LoongArch 与 开发板，所以除了“独自实现了2022版本的NPUcore到2k1000平台（龙芯架构）的适配，并封装为一个arch包，方便后人持续开发”与“基本完成了NPUcore在ext4文件系统的适配，但仍有少部分bug”外，其他方面贡献与创新有限。
+
+我们对比 NPUcore 其实有不少可以改进的地方，主要是写时复制（CoW）和懒分配（lazy allocation）。
 

@@ -21,7 +21,7 @@ static THREAD_TABLE: Mutex<BTreeMap<Pid, Arc<Thread>>> =
     Mutex::new(BTreeMap::<Pid, Arc<Thread>>::new());
 ```
 
-同一层次间，我们使用 BTreeMap 关联 id 与 指针来管理。对于创建会话/进程组/进程/线程，每一层的实现相仿，出于通用性考量，创建新的会话/进程组/进程/线程的接口在模块内部公开，只需提供指定的 id 、parent 、所属上级结构即可调用。
+同一层次间，我们使用一张如上所示的表来管理。对于创建会话/进程组/进程/线程，每一层的实现相仿。出于通用性考量，创建新的会话/进程组/进程/线程的接口在模块内部公开，只需提供指定的 id 、parent 、所属上级结构即可调用。
 
 这里以创建一个新的进程为例进行解释。
 
@@ -106,5 +106,32 @@ let data = get_process_data(pid); // 从 PROCESS_DATA_TABLE 获取
 我们将 process data 单独作为一个结构体 ，其中不包含对应的process的指针，反过来，Process 结构体中也不包含对应的 process data 的指针。
 
 对于 thread data 和 thread 作相同处理。（此外，我们通过thread data 获取对应的ProcessData。）
+
+```rust
+pub struct TaskExt {
+    /// The time statistics.
+    pub time: RefCell<TimeStat>,
+    /// The POSIX thread corresponding to this task.
+    pub thread: Arc<Thread>,
+    /// The thread data bind to this task.
+    pub thread_data: Arc<ThreadData>,
+}
+
+pub fn current_thread() -> Arc<Thread> {
+    current().task_ext().thread.clone()
+}
+
+pub fn current_thread_data() -> Arc<ThreadData> {
+    current().task_ext().thread_data.clone()
+}
+
+pub fn current_process() -> Arc<Process> {
+    current_thread().get_process()
+}
+
+pub fn current_process_data() -> Arc<ProcessData> {
+    current_thread_data().process_data.clone()
+}
+```
 
 这样设计，我们通过pid分别可以在 PROCESS_TABLE 和 PROCESS_DATA_TABLE 中分别获取 Process 和 ProcessData ，这样解耦合后可以将 Process 相关部分独立出来作为一个单独的 crate 。
