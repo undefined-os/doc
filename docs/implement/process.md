@@ -16,7 +16,12 @@
 
 **会话/进程组/进程/线程创建**
 
-同一层次间，我们使用 BTreeMap 关联 id 与 指针来管理，支持会话/进程组/进程/线程创建，每一层实现相仿，出于作为一个通用模块的设计考量，创建新的会话/进程组/进程/线程的接口在模块内部公开，不封装在结构体内部，只需提供指定的 id 、parent 、所属上级结构即可调用。
+```rust
+static THREAD_TABLE: Mutex<BTreeMap<Pid, Arc<Thread>>> =
+    Mutex::new(BTreeMap::<Pid, Arc<Thread>>::new());
+```
+
+同一层次间，我们使用 BTreeMap 关联 id 与 指针来管理。对于创建会话/进程组/进程/线程，每一层的实现相仿，出于通用性考量，创建新的会话/进程组/进程/线程的接口在模块内部公开，只需提供指定的 id 、parent 、所属上级结构即可调用。
 
 这里以创建一个新的进程为例进行解释。
 
@@ -89,3 +94,17 @@ fn generate_next_pid() -> Pid {
 * session leader 无法迁移进程组
 * 目标进程组必须存在于当前会话中，不能跨会话迁移进程组
 * 创建新的进程组时一定有  pgid == pid  ，即进程组id等于创建它的进程的id
+
+**process data 与 thread data**
+
+```rust
+// 解耦后的访问方式（无直接指针）
+let process = get_process(pid); // 从 PROCESS_TABLE 获取
+let data = get_process_data(pid); // 从 PROCESS_DATA_TABLE 获取
+```
+
+我们将 process data 单独作为一个结构体 ，其中不包含对应的process的指针，反过来，Process 结构体中也不包含对应的 process data 的指针。
+
+对于 thread data 和 thread 作相同处理。（此外，我们通过thread data 获取对应的ProcessData。）
+
+这样设计，我们通过pid分别可以在 PROCESS_TABLE 和 PROCESS_DATA_TABLE 中分别获取 Process 和 ProcessData ，这样解耦合后可以将 Process 相关部分独立出来作为一个单独的 crate 。
