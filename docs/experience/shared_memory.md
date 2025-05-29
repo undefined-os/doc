@@ -50,7 +50,6 @@ pub fn sys_shmdt(shm_addr: c_ulong);
 
 ## 开发经历
 
-- 在进行共享内存读写测试`iozone`的时候发现读写结果错误，调试发现是因为原有框架下默认采取线性映射，将缓冲区全都从用户态加载到内核态，保证线性映射。
 - 在`sys_shmctl`将一个共享内存块设置为待删除时，我们的做法是直接将其从全局表单中移除，这样就可以在所有`attach`一段共享内存的进程`detach`或者结束后，利用`Rust`的`Drop`机制，优雅地实现自动内存释放，也不再需要维护`SharedMemory`的`deleted`成员变量。
 - 同时这种设计的另一个好处是：规定被`sys_shmctl`标记为待删除的共享内存段不应还能够被`sys_shmat`映射，我们直接删除的做法可以让全局表单中查不到这个共享内存段，从而杜绝了这种行为，否则还需要再`sys_shmat`中进行判定校验。
 - `ProcessData`的`shared_memory`类型定义为`Mutex<BTreeMap<VirtAddr, Arc<SharedMemory>>>`，原因是`sys_shmdt`的参数类型是`shm_addr`，这样设置方便直接找到虚拟地址所对应的共享内存段。
