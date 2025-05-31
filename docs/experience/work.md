@@ -4,6 +4,10 @@
 
 ## 宋建昊
 
+- 网络(`socket`)部分`syscall`
+- 内存(`shared-memory`)部分`syscall`
+- 文件系统(`stat`)部分`syscall`
+- 参与各类问题的调试与解决
 
 ## 黄雨婕
 
