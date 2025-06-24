@@ -1,0 +1,1283 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://undefined-os.github.io/doc/implement/process/">
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../syscall_trace/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>process模块（独立模块） - Undefined OS 文档</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#process" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Undefined OS 文档" class="md-header__button md-logo" aria-label="Undefined OS 文档" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Undefined OS 文档
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              process模块（独立模块）
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Undefined OS 文档" class="md-nav__button md-logo" aria-label="Undefined OS 文档" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Undefined OS 文档
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Undefined OS 项目文档
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Application
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Application
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    应用程序
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/busybox/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Busybox
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/gcc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    gcc
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/git/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    git
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/grep/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    grep
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/lua/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    lua
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/python3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    python
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/sqlite3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    sqlite3
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/tcc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tcc (Tiny C Compiler)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Architecture
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    总体架构设计
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/syscall/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    系统调用架构设计
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Comparation
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Comparation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../comparation/npucore-impact/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    NPUcore-IMPACT
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../comparation/oskernel-2024-pantheon/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    oskernel-2024-pantheon
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../comparation/trust-os/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    TrustOS
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Experience
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Experience
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../experience/Problem%26Solving/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    问题与解决
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../experience/bug_fix/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    问题修复
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../experience/doc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    协助编写文档
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../experience/hal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    HAL层开发
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../experience/resource/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    resource limit 相关开发
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../experience/shared_memory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    共享内存(Shared Memory)开发
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../experience/stat/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    stat系列syscall开发
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../experience/work/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    分工情况
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Implement
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Implement
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    实现内容
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    process模块（独立模块）
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    process模块（独立模块）
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      细节说明
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../syscall_trace/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    syscall-trace模块（独立模块）
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      细节说明
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="process">process模块（独立模块）<a class="headerlink" href="#process" title="Permanent link">&para;</a></h1>
+<p>我们实现了一个独立模块process，它是操作系统无关的，可以作为一个基础组件提供给其他操作系统使用，没有依赖ArceOS或者UndefinedOS中的组件。</p>
+<p>在Linux中，进程的组织结构包括session, process group, process这几个层次，POSIX thread属于特殊的process。此外，进程之间还存在父子关系。</p>
+<p>在我们的设计中，我们认为调度的基本单元是线程，我们据此设计了操作系统无关的线程和进程模型，旨在提供一个通用的包，来提供进程和线程管理操作，基本覆盖了POSIX的所有进程/线程操作，如：</p>
+<ul>
+<li>会话/进程组/进程/线程创建</li>
+<li>线程/进程退出(包括exit_group)和收养</li>
+<li>更改进程所在的进程组</li>
+<li>pid/tid查询和管理</li>
+<li>进程fork和创建新线程</li>
+</ul>
+<h2 id="_1">细节说明<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p><strong>会话/进程组/进程/线程创建</strong></p>
+<div class="highlight"><pre><span></span><code><span class="k">static</span><span class="w"> </span><span class="n">THREAD_TABLE</span><span class="p">:</span><span class="w"> </span><span class="nc">Mutex</span><span class="o">&lt;</span><span class="n">BTreeMap</span><span class="o">&lt;</span><span class="n">Pid</span><span class="p">,</span><span class="w"> </span><span class="n">Arc</span><span class="o">&lt;</span><span class="n">Thread</span><span class="o">&gt;&gt;&gt;</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="n">Mutex</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">BTreeMap</span><span class="p">::</span><span class="o">&lt;</span><span class="n">Pid</span><span class="p">,</span><span class="w"> </span><span class="n">Arc</span><span class="o">&lt;</span><span class="n">Thread</span><span class="o">&gt;&gt;</span><span class="p">::</span><span class="n">new</span><span class="p">());</span>
+</code></pre></div>
+<p>同一层次间，我们使用一张如上所示的表来管理。对于创建会话/进程组/进程/线程，每一层的实现相仿。出于通用性考量，创建新的会话/进程组/进程/线程的接口在模块内部公开，只需提供指定的 id 、parent 、所属上级结构即可调用。</p>
+<p>这里以创建一个新的进程为例进行解释。</p>
+<div class="highlight"><pre><span></span><code><span class="k">static</span><span class="w"> </span><span class="n">PROCESS_TABLE</span><span class="p">:</span><span class="w"> </span><span class="nc">Mutex</span><span class="o">&lt;</span><span class="n">BTreeMap</span><span class="o">&lt;</span><span class="n">Pid</span><span class="p">,</span><span class="w"> </span><span class="n">Arc</span><span class="o">&lt;</span><span class="n">Process</span><span class="o">&gt;&gt;&gt;</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="n">Mutex</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">BTreeMap</span><span class="p">::</span><span class="o">&lt;</span><span class="n">Pid</span><span class="p">,</span><span class="w"> </span><span class="n">Arc</span><span class="o">&lt;</span><span class="n">Process</span><span class="o">&gt;&gt;</span><span class="p">::</span><span class="n">new</span><span class="p">());</span>
+
+<span class="sd">/// Create a new process if the process does not exist</span>
+<span class="k">fn</span><span class="w"> </span><span class="nf">create_process</span><span class="p">(</span><span class="n">pid</span><span class="p">:</span><span class="w"> </span><span class="nc">Pid</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="p">:</span><span class="w"> </span><span class="nc">Weak</span><span class="o">&lt;</span><span class="n">Process</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">group</span><span class="p">:</span><span class="w"> </span><span class="nc">Weak</span><span class="o">&lt;</span><span class="n">ProcessGroup</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nc">Arc</span><span class="o">&lt;</span><span class="n">Process</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">process_table</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PROCESS_TABLE</span><span class="p">.</span><span class="n">lock</span><span class="p">();</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">process_table</span><span class="p">.</span><span class="n">contains_key</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pid</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="fm">panic!</span><span class="p">(</span><span class="s">&quot;[process] process with id {} already exists&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">pid</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="c1">// create process</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">process</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Process</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="p">.</span><span class="n">clone</span><span class="p">(),</span><span class="w"> </span><span class="n">group</span><span class="p">.</span><span class="n">clone</span><span class="p">());</span>
+<span class="w">    </span><span class="c1">// add to process group</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">group</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">group</span><span class="p">.</span><span class="n">upgrade</span><span class="p">().</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="w">    </span><span class="n">group</span><span class="p">.</span><span class="n">add_process</span><span class="p">(</span><span class="n">process</span><span class="p">.</span><span class="n">clone</span><span class="p">());</span>
+<span class="w">    </span><span class="c1">// add to parent</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">parent</span><span class="p">.</span><span class="n">upgrade</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">parent</span><span class="p">.</span><span class="n">children</span><span class="p">.</span><span class="n">lock</span><span class="p">().</span><span class="n">insert</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span><span class="w"> </span><span class="n">process</span><span class="p">.</span><span class="n">clone</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="c1">// create main thread</span>
+<span class="w">    </span><span class="n">create_thread</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span><span class="w"> </span><span class="n">Arc</span><span class="p">::</span><span class="n">downgrade</span><span class="p">(</span><span class="o">&amp;</span><span class="n">process</span><span class="p">));</span>
+<span class="w">    </span><span class="c1">// add to process table</span>
+<span class="w">    </span><span class="n">process_table</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span><span class="w"> </span><span class="n">process</span><span class="p">.</span><span class="n">clone</span><span class="p">());</span>
+<span class="w">    </span><span class="n">process</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>调用 create_process 所需参数为 分配给新进程的 pid ，指向父进程的指针、指向新进程的 process group 的指针。</p>
+<p>调用 create_process 后首先实例化一个新的 Process 结构体，将其与指定pid关联，加入全局进程表与指定的 process group 中，随后调用 create_thread ，为这个新的进程创建一个线程 。</p>
+<p><strong>进程Fork和线程创建</strong></p>
+<p>进程 fork 通过调用 create_process 实现，发起 fork 的进程调用 create_process 时需指定 parent 为自己，子进程与父进程属于同一个进程组，新创建出的子进程只有一个主线程。</p>
+<p><strong>线程/进程退出(包括exit_group)和收养</strong></p>
+<p>我们维护进程之间的父子关系，进程 fork 时成为新进程的父进程，并且实现了收养机制。</p>
+<p>具体来说：</p>
+<ul>
+<li>线程退出调用 <code>Process::remove_thread</code>更新线程表，最后一个线程退出触发进程退出</li>
+<li>进程退出时通过 <code>is_zombie</code>原子标志位标记为僵尸状态，将自己从所属进程组移除</li>
+<li>空进程组自动从会话中移除</li>
+<li>空会话自动从全局会话表移除</li>
+<li>进程退出时其子进程由最近的收养者或是init进程收养</li>
+<li>线程调用 exit_group 先自己 exit ，然后向其他线程发送信号，使所有线程退出</li>
+</ul>
+<p><strong>pid/tid查询和管理</strong></p>
+<div class="highlight"><pre><span></span><code><span class="k">static</span><span class="w"> </span><span class="n">NEXT_PID</span><span class="p">:</span><span class="w"> </span><span class="nc">AtomicU32</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AtomicU32</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+
+<span class="k">fn</span><span class="w"> </span><span class="nf">generate_next_pid</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nc">Pid</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">NEXT_PID</span><span class="p">.</span><span class="n">fetch_add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">Ordering</span><span class="p">::</span><span class="n">Acquire</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+<ul>
+<li>对于session, process group, process这几个层次结构，我们实现了和linux一致的 main thread 、process group leader 、session leader 等</li>
+<li>process id 实际上就是主线程的 thread id ， process group id 等于其 leader 的 process id , session id 等于其 leader 的 process group id</li>
+<li>由于 process id 实际上就是主线程的 thread id，所以我们通过同一个原子计数器保证全局唯一PID/TID分配</li>
+<li>进程/线程生命周期与ID绑定，对象销毁时释放ID</li>
+</ul>
+<p><strong>更改进程所在的进程组</strong></p>
+<p>实现上非常简单，先在旧的进程组中移除某进程，然后将其添加到新的进程组中，但需要遵循<strong>约束条件</strong>：</p>
+<ul>
+<li>session leader 无法迁移进程组</li>
+<li>目标进程组必须存在于当前会话中，不能跨会话迁移进程组</li>
+<li>创建新的进程组时一定有  pgid == pid  ，即进程组id等于创建它的进程的id</li>
+</ul>
+<p><strong>process data 与 thread data</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1">// 解耦后的访问方式（无直接指针）</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">process</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_process</span><span class="p">(</span><span class="n">pid</span><span class="p">);</span><span class="w"> </span><span class="c1">// 从 PROCESS_TABLE 获取</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_process_data</span><span class="p">(</span><span class="n">pid</span><span class="p">);</span><span class="w"> </span><span class="c1">// 从 PROCESS_DATA_TABLE 获取</span>
+</code></pre></div>
+<p>我们将 process data 单独作为一个结构体 ，其中不包含对应的process的指针，反过来，Process 结构体中也不包含对应的 process data 的指针。</p>
+<p>对于 thread data 和 thread 作相同处理。（此外，我们通过thread data 获取对应的ProcessData。）</p>
+<div class="highlight"><pre><span></span><code><span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">TaskExt</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="sd">/// The time statistics.</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">time</span><span class="p">:</span><span class="w"> </span><span class="nc">RefCell</span><span class="o">&lt;</span><span class="n">TimeStat</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">    </span><span class="sd">/// The POSIX thread corresponding to this task.</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">thread</span><span class="p">:</span><span class="w"> </span><span class="nc">Arc</span><span class="o">&lt;</span><span class="n">Thread</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">    </span><span class="sd">/// The thread data bind to this task.</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">thread_data</span><span class="p">:</span><span class="w"> </span><span class="nc">Arc</span><span class="o">&lt;</span><span class="n">ThreadData</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">current_thread</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nc">Arc</span><span class="o">&lt;</span><span class="n">Thread</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">current</span><span class="p">().</span><span class="n">task_ext</span><span class="p">().</span><span class="n">thread</span><span class="p">.</span><span class="n">clone</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">current_thread_data</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nc">Arc</span><span class="o">&lt;</span><span class="n">ThreadData</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">current</span><span class="p">().</span><span class="n">task_ext</span><span class="p">().</span><span class="n">thread_data</span><span class="p">.</span><span class="n">clone</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">current_process</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nc">Arc</span><span class="o">&lt;</span><span class="n">Process</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">current_thread</span><span class="p">().</span><span class="n">get_process</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">current_process_data</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nc">Arc</span><span class="o">&lt;</span><span class="n">ProcessData</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">current_thread_data</span><span class="p">().</span><span class="n">process_data</span><span class="p">.</span><span class="n">clone</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>这样设计，我们通过pid分别可以在 PROCESS_TABLE 和 PROCESS_DATA_TABLE 中分别获取 Process 和 ProcessData ，这样解耦合后可以将 Process 相关部分独立出来作为一个单独的 crate 。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>

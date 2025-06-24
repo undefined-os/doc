@@ -1,0 +1,1311 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://undefined-os.github.io/doc/experience/shared_memory/">
+      
+      
+        <link rel="prev" href="../resource/">
+      
+      
+        <link rel="next" href="../stat/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>共享内存(Shared Memory)开发 - Undefined OS 文档</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#shared-memory" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Undefined OS 文档" class="md-header__button md-logo" aria-label="Undefined OS 文档" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Undefined OS 文档
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              共享内存(Shared Memory)开发
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Undefined OS 文档" class="md-nav__button md-logo" aria-label="Undefined OS 文档" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Undefined OS 文档
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Undefined OS 项目文档
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Application
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Application
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    应用程序
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/busybox/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Busybox
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/gcc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    gcc
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/git/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    git
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/grep/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    grep
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/lua/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    lua
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/python3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    python
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/sqlite3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    sqlite3
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../application/tcc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tcc (Tiny C Compiler)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Architecture
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    总体架构设计
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/syscall/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    系统调用架构设计
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Comparation
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Comparation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../comparation/npucore-impact/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    NPUcore-IMPACT
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../comparation/oskernel-2024-pantheon/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    oskernel-2024-pantheon
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../comparation/trust-os/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    TrustOS
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Experience
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Experience
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Problem%26Solving/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    问题与解决
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bug_fix/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    问题修复
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../doc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    协助编写文档
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    HAL层开发
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    resource limit 相关开发
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    共享内存(Shared Memory)开发
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    共享内存(Shared Memory)开发
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#syscall" class="md-nav__link">
+    <span class="md-ellipsis">
+      syscall实现
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      模块设计
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      开发经历
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      设计思路
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stat/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    stat系列syscall开发
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../work/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    分工情况
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Implement
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Implement
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../implement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    实现内容
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../implement/process/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    process模块（独立模块）
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../implement/syscall_trace/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    syscall-trace模块（独立模块）
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#syscall" class="md-nav__link">
+    <span class="md-ellipsis">
+      syscall实现
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      模块设计
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      开发经历
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      设计思路
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="shared-memory">共享内存(Shared Memory)开发<a class="headerlink" href="#shared-memory" title="Permanent link">&para;</a></h1>
+<h2 id="syscall"><code>syscall</code>实现<a class="headerlink" href="#syscall" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">sys_shmget</span><span class="p">(</span><span class="n">key</span><span class="p">:</span><span class="w"> </span><span class="nc">c_int</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">:</span><span class="w"> </span><span class="nc">c_ulong</span><span class="p">,</span><span class="w"> </span><span class="n">shm_flag</span><span class="p">:</span><span class="w"> </span><span class="nc">c_int</span><span class="p">);</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">sys_shmat</span><span class="p">(</span><span class="n">shm_id</span><span class="p">:</span><span class="w"> </span><span class="nc">c_int</span><span class="p">,</span><span class="w"> </span><span class="n">shm_addr</span><span class="p">:</span><span class="w"> </span><span class="nc">c_ulong</span><span class="p">,</span><span class="w"> </span><span class="n">shm_flag</span><span class="p">:</span><span class="w"> </span><span class="nc">c_int</span><span class="p">);</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">sys_shmctl</span><span class="p">(</span><span class="n">shm_id</span><span class="p">:</span><span class="w"> </span><span class="nc">c_int</span><span class="p">,</span><span class="w"> </span><span class="n">op</span><span class="p">:</span><span class="w"> </span><span class="nc">c_int</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">:</span><span class="w"> </span><span class="nc">c_ulong</span><span class="p">);</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">sys_shmdt</span><span class="p">(</span><span class="n">shm_addr</span><span class="p">:</span><span class="w"> </span><span class="nc">c_ulong</span><span class="p">);</span>
+</code></pre></div>
+<h2 id="_1">模块设计<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">SharedMemory</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="sd">/// The key of the shared memory segment</span>
+<span class="w">      </span><span class="k">pub</span><span class="w"> </span><span class="n">key</span><span class="p">:</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span>
+<span class="w">      </span><span class="sd">/// Virtual kernel address of the shared memory segment</span>
+<span class="w">      </span><span class="k">pub</span><span class="w"> </span><span class="n">addr</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="p">,</span>
+<span class="w">      </span><span class="sd">/// Page count of the shared memory segment</span>
+<span class="w">      </span><span class="k">pub</span><span class="w"> </span><span class="n">page_count</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="p">,</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="k">impl</span><span class="w"> </span><span class="nb">Drop</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">SharedMemory</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">fn</span><span class="w"> </span><span class="nf">drop</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="kd">let</span><span class="w"> </span><span class="n">allocator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">global_allocator</span><span class="p">();</span>
+<span class="w">          </span><span class="n">allocator</span><span class="p">.</span><span class="n">dealloc_pages</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">addr</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">page_count</span><span class="p">);</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">SharedMemoryManager</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">mem_map</span><span class="p">:</span><span class="w"> </span><span class="nc">Mutex</span><span class="o">&lt;</span><span class="n">BTreeMap</span><span class="o">&lt;</span><span class="kt">u32</span><span class="p">,</span><span class="w"> </span><span class="n">Arc</span><span class="o">&lt;</span><span class="n">SharedMemory</span><span class="o">&gt;&gt;&gt;</span><span class="p">,</span>
+<span class="w">      </span><span class="n">next_key</span><span class="p">:</span><span class="w"> </span><span class="nc">AtomicU32</span><span class="p">,</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="k">impl</span><span class="w"> </span><span class="n">SharedMemoryManager</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">//...</span>
+<span class="w">      </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="p">:</span><span class="w"> </span><span class="kt">u32</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="p">{</span>
+<span class="w">           </span><span class="c1">// sys_shmctl在IPC_RMID参数下的行为就是将对应的SharedMemory从全局的SHARED_MEMORY_MANAGER中remove</span>
+<span class="w">          </span><span class="bp">self</span><span class="p">.</span><span class="n">mem_map</span><span class="p">.</span><span class="n">lock</span><span class="p">().</span><span class="n">remove</span><span class="p">(</span><span class="o">&amp;</span><span class="n">key</span><span class="p">).</span><span class="n">is_some</span><span class="p">()</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="k">pub</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="n">SHARED_MEMORY_MANAGER</span><span class="p">:</span><span class="w"> </span><span class="nc">SharedMemoryManager</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SharedMemoryManager</span><span class="p">::</span><span class="n">new</span><span class="p">();</span>
+
+<span class="w">  </span><span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">ProcessData</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">//方便sys_shmdt找到对应的SharedMemory，其参数是一个虚拟地址</span>
+<span class="w">      </span><span class="sd">/// Shared memory</span>
+<span class="w">      </span><span class="k">pub</span><span class="w"> </span><span class="n">shared_memory</span><span class="p">:</span><span class="w"> </span><span class="nc">Mutex</span><span class="o">&lt;</span><span class="n">BTreeMap</span><span class="o">&lt;</span><span class="n">VirtAddr</span><span class="p">,</span><span class="w"> </span><span class="n">Arc</span><span class="o">&lt;</span><span class="n">SharedMemory</span><span class="o">&gt;&gt;&gt;</span><span class="p">,</span>
+<span class="w">  </span><span class="p">}</span>
+</code></pre></div>
+<h2 id="_2">开发经历<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<ul>
+<li>在<code>sys_shmctl</code>将一个共享内存块设置为待删除时，我们的做法是直接将其从全局表单中移除，这样就可以在所有<code>attach</code>一段共享内存的进程<code>detach</code>或者结束后，利用<code>Rust</code>的<code>Drop</code>机制，优雅地实现自动内存释放，也不再需要维护<code>SharedMemory</code>的<code>deleted</code>成员变量。</li>
+<li>同时这种设计的另一个好处是：规定被<code>sys_shmctl</code>标记为待删除的共享内存段不应还能够被<code>sys_shmat</code>映射，我们直接删除的做法可以让全局表单中查不到这个共享内存段，从而杜绝了这种行为，否则还需要再<code>sys_shmat</code>中进行判定校验。</li>
+<li><code>ProcessData</code>的<code>shared_memory</code>类型定义为<code>Mutex&lt;BTreeMap&lt;VirtAddr, Arc&lt;SharedMemory&gt;&gt;&gt;</code>，原因是<code>sys_shmdt</code>的参数类型是<code>shm_addr</code>，这样设置方便直接找到虚拟地址所对应的共享内存段。</li>
+</ul>
+<h2 id="_3">设计思路<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>关于共享内存自动释放的问题，有时OS会面临一种特殊的情况————一段通过共享内存段，如果所有通过<code>sys_shmat</code>绑定这段内存的进程都通过<code>sys_shmdt</code>解绑了，但是没有任何进程调用<code>sys_shmctl</code>把它标记为待删除，操作系统是否应该释放这段内存？此时一般有两种做法。</p>
+<ul>
+<li>全局表单中<code>SharedMemoryManager</code>中使用强引用，也就是我们现在的实现方式，只有在有进程调用了<code>sys_shmctl</code>把某段共享内存设置为待删除同时所有绑定的进程解绑的时候才会进行释放，充分尊重了用户程序的行为，但是在用户程序不规范的情况下会造成内存泄露。</li>
+<li>全局表单中<code>SharedMemoryManager</code>中使用弱引用，即使没有进程调用了<code>sys_shmctl</code>把某段共享内存设置为待删除，只要所有绑定的进程解绑就进行释放，一定程度上解决了内存释放的问题，但是OS无法假设所有进程解绑后共享内存就不再需要，因为其他进程可能在未来重新通过<code>sys_shmat</code>附加到该内存段。</li>
+</ul>
+<p>面临这种<code>trade-off</code>，我们去查阅了<code>linux</code>操作系统的行为，具体如下：</p>
+<ul>
+<li>
+<p>通过<code>sys_shmget</code>创建的共享内存段是持久性系统级资源，声明周期独立于创建它的进程。它的生命周期不与任何单个进程绑定。即使所有进程都已调用<code>sys_shmdt</code>解绑或进程终止，共享内存段仍然存在于内核中，占用内存资源，直到显式调用<code>sys_shmctl</code>或系统重启，总体来说采取前者的实现。</p>
+</li>
+<li>
+<p>那么如何解决共享内存导致的内存泄漏问题呢？</p>
+</li>
+</ul>
+<p>前面提到的系统重启的时候会清空所有 System V IPC 资源，包括共享内存段。同时<code>Linux</code>提供了工具，允许用户或管理员手动检查和删除不再需要的共享内存段，以解决内存泄漏问题。</p>
+<ul>
+<li><code>ipcs</code>命令：列出系统中当前存在的共享内存段（以及其他 IPC 资源，如信号量和消息队列），帮助用户识别可能未被正确清理的共享内存段。如果某共享内存段<code>nattch</code>表示附加的进程数。如果为<code>0</code>，说明没有进程使用该内存段，可能是泄漏的候选对象。</li>
+<li><code>ipcrm</code>命令：手动删除指定的共享内存段，允许管理员清理不再需要的共享内存段，解决内存泄漏。使用strace命令检查后发现<code>ipcrm</code>会调用<code>sys_shmctl</code>进行共享内存段的删除。</li>
+</ul>
+<p><div class="highlight"><pre><span></span><code>ipcs<span class="w"> </span>-m
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>------<span class="w"> </span>Shared<span class="w"> </span>Memory<span class="w"> </span>Segments<span class="w"> </span>--------
+key<span class="w">        </span>shmid<span class="w">      </span>owner<span class="w">      </span>perms<span class="w">      </span>bytes<span class="w">      </span>nattch<span class="w">     </span>status<span class="w">      </span>
+0x00000000<span class="w"> </span><span class="m">12345</span><span class="w">      </span>user<span class="w">       </span><span class="m">666</span><span class="w">        </span><span class="m">4096</span><span class="w">       </span><span class="m">0</span><span class="w">          </span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>strace<span class="w"> </span>ipcrm<span class="w"> </span>-m<span class="w"> </span><span class="m">12345</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>//...
+shmctl<span class="o">(</span><span class="m">12345</span>,<span class="w"> </span>IPC_RMID,<span class="w"> </span>NULL<span class="o">)</span><span class="w">           </span><span class="o">=</span><span class="w"> </span><span class="m">0</span>
+//...
++++<span class="w"> </span>exited<span class="w"> </span>with<span class="w"> </span><span class="m">1</span><span class="w"> </span>+++
+</code></pre></div></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>
