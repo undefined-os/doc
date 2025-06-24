@@ -43,8 +43,11 @@ pub fn write(&mut self, buf: &[u8]) -> AxResult<usize> {
 ![内存图像](../../images/memory_size_plot_new_allocation.png)
 - 但是后续又发现如果在跑过一遍`musl`的`libctest`之后再进行一次`glibc`的`libctest`，即连续进行两次`libctest`，还是会出现内存不足的问题，如下图。
 ![内存图像](../../images/memory_size_plot_double_patch.png)
-- 可以发现当前内存系统在当前有足够`available MiB`的情况下依然试图申请新的`page`，导致了内存不足，更换了内存系统解决了问题，如下图。
+- 可以发现当前内存系统在当前有足够`available MiB`的情况下依然试图申请新的`page`，导致了内存不足，更换了内存分配器，把`tlsf`改成`slab`了解决了问题，如下图。
 ![内存图像](../../images/memory_size_plot_new_fs.png)
+
+- 合并的COW代码会在栈上面分配巨大的数组，直接导致栈溢出，但内核没法发觉到这种情况，然后尝试在溢出之后写入，结果意外写入到MMIO区域里导致错误。后续通过分配到堆上面避免了在栈上创建大数组。
+
 
 ## 测例问题
 
