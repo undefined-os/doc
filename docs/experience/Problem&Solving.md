@@ -36,6 +36,16 @@ pub fn write(&mut self, buf: &[u8]) -> AxResult<usize> {
 - `aarch64`架构下测评会发现找不到已经映射的页面，更新了依赖`page_table_multiarch`的正确兼容`aarch64`的版本后问题解决。
 
 - 我们发现由于`Loongarch64`的内存布局和其他架构不同，需要给其分配更大的内存才足够通过`iozone`(否则会显示内存不足)，我们对可能的原因进行了调研，结果认为有可能是因为`Loongarch64`架构的虚拟地址空间存在“空洞”，即部分地址不可用，这可能导致需要分配更大的内存以弥补空洞造成的内存损失。
+
+- 在进行`libctest`的过程中，内存系统会遇到内存不足，内存分配失败的情况，如下图。
+![内存图像](../../images/memory_size_plot.png)
+- 我们调整了内存分配策略，在页不足的情况下不在申请分配上次两倍的大小，而是在内存剩余量少于一定值的情况下申请剩余大小的一定比例，成功解决了问题，如下图。
+![内存图像](../../images/memory_size_plot_new_allocation.png)
+- 但是后续又发现如果在跑过一遍`musl`的`libctest`之后再进行一次`glibc`的`libctest`，即连续进行两次`libctest`，还是会出现内存不足的问题，如下图。
+![内存图像](../../images/memory_size_plot_double_patch.png)
+- 可以发现当前内存系统在当前有足够`available MiB`的情况下依然试图申请新的`page`，导致了内存不足，更换了内存系统解决了问题，如下图。
+![内存图像](../../images/memory_size_plot_new_fs.png)
+
 ## 测例问题
 
 - 测例架构支持：最早`basic`测例仅仅支持`x86_64`架构，初始的`starry-next`也只支持`x86_64`架构，所以最开始可以通过`basic`测例，但我们支持了四个架构的`stat`系列`syscall`之后`basic`测例无法通过，后更换了测例镜像使得`basic`测例支持四个架构后问题解决。
